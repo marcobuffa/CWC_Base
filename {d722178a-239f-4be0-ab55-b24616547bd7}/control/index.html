@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Base CWC 4 training</title>
+        <link rel="stylesheet" href="css/style.css">
+        <script src="libs/webcc.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <p id="Connection">Questo CWC è in esecuzione in un <em>browser</em></p>
+            <p>
+                NumberParameter: <input type="number" id="NumberParameter" name="NumberParameter" value="0"/>
+                <button onclick="GenerateEventWithNumber()">Genera EventWithNumber</button>
+            </p>
+            <p>
+                StringParameter: <input type="text" id="StringParameter" name="StringParameter" value=""/>
+                <button onclick="GenerateEventWithString()">Genera EventWithString</button>
+            </p>
+            <p>
+                <button onclick="SendParameters()">Invia parametri a WinCC</button>
+            </p>
+            <p id="Method">
+                L'ultimo metodo chiamato è stato:
+            </p>
+        </div>
+
+        <script>
+
+            var wincc = false; //flag presenza runtime
+
+            function GenerateEventWithNumber(){
+                if (wincc) { //se runtime presente
+                    //genera evento e passa il parametro corrispondente
+                    WebCC.Events.fire("EventWithNumber", document.getElementById('NumberParameter').value);
+                } else {
+                    console.log("Nessuna connessione con WinCC");
+                }
+            }
+
+            function GenerateEventWithString(){
+                if (wincc) { //se runtime presente
+                    //genera evento e passa il parametro corrispondente
+                    WebCC.Events.fire("EventWithString", document.getElementById('StringParameter').value);
+                } else {
+                    console.log("Nessuna connessione con WinCC");
+                }
+            }
+
+            function SendParameters(){
+                if (wincc) { //se runtime presente
+                    //scrivi i parametri direttamente, senza generare eventi
+                    WebCC.Properties.NumberParameter = document.getElementById('NumberParameter').value;
+                    WebCC.Properties.StringParameter = document.getElementById('StringParameter').value;
+                } else {
+                    console.log("Nessuna connessione con WinCC");
+                }
+            }
+
+            //Callback nuovi parametri da WinCC
+            function dataFromWinCC(data){
+                //data.value --> nuovo valore
+                //data.key --> nome del parametro aggiornato
+                console.log("Nuovo parametro ricevuto da WinCC:");
+                console.log(data);
+				switch (data.key) {
+					case "NumberParameter":
+                            document.getElementById('NumberParameter').value = data.value;
+						break;
+					case "StringParameter":
+                            document.getElementById('StringParameter').value = data.value;
+						break;
+				}
+			}
+
+            //connessione con WinCC
+            WebCC.start(
+                function(result) {
+                    if (result) { //c'è un'istanza di WinCC in esecuzione
+                        console.log("Connessione con WinCC avvenuta con successo");
+                        if (WebCC.isDesignMode) { //l'istanza è di ingegneria (TIA Portal)
+							document.getElementById('Connection').innerHTML = "Questo CWC è in esecuzione in <em>ingegneria (TIA Portal)</em>";
+						} else { //l'istanza è di runtime
+                            document.getElementById('Connection').innerHTML = "Questo CWC è in esecuzione nel <em>runtime</em>";
+							try {
+                                wincc = true; //attiva flag presenza runtime
+                                WebCC.onPropertyChanged.subscribe(dataFromWinCC); //registrazione callback chiamata quando arrivano nuovi dati da WinCC
+                            } 
+                            catch (error) {
+                                console.log(error);
+                            }
+						}
+                        
+                    } else {
+                        console.log("Connessione con WinCC non riuscita (sono in un browser?)");
+                    }
+                },
+                {
+                    //dichiarazione di metodi, eventi e parametri (deve coincidere con il manifest!)
+                    methods: {
+                        MethodWithNumber: function(NumberParameter){
+                            console.log("Chiamato metodo MethodWithNumber con parametro: " + NumberParameter);
+                            document.getElementById('Method').innerHTML = "L'ultimo metodo chiamato è stato: <em>MethodWithNumber</em>"
+                            document.getElementById('NumberParameter').value = NumberParameter;
+                        },
+                        MethodWithString: function(StringParameter){
+                            console.log("Chiamato metodo MethodWithString con parametro: " + StringParameter);
+                            document.getElementById('Method').innerHTML = "L'ultimo metodo chiamato è stato: <em>MethodWithString</em>"
+                            document.getElementById('StringParameter').value = StringParameter;
+                        }
+                    },
+                    events: [
+                        "EventWithNumber",
+                        "EventWithString",
+                    ],
+                    properties: {
+                        NumberParameter: 0,
+                        StringParameter: "",
+                    }
+                },
+                ["HMI"],
+                10000
+            );
+        </script>
+    </body>
+</html>
