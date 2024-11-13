@@ -33,17 +33,17 @@ Icon created by [Tanah Basah - Flaticon](https://www.flaticon.com/free-icons/cou
 ### How does this works?
 This CWC (Custom Web Control) is intended to show:
 1. the 3 data exchange mechanisms between a WinCC Unified RT and a CWC
-2. how to discriminate between CWC being executed in a browser, in TIA Portal (yes, TIA Portal does execute CWCs) or a WinCC Unified RT
+2. how to discriminate between CWC being executed in a browser, in TIA Portal (yes, TIA Portal does execute CWCs) or in a WinCC Unified RT
 
 ### Data exchange
-A CWC is just a web page running inside an iFrame in a WinCC Unified project.
+A CWC is just a web page running inside an iframe in a WinCC Unified project.
 
 Any client-side code can be run in a CWC, but this would be nearly useless without any data exchange mechanisms between the inner content of the CWC and the WinCC Unified RT (outside the CWC).
 
 3 mechanisms are available to get a fully bidirectional data exchange: parameters, events and methods.
 
 #### Parameters
-This is the simplest method: number, string, or structured (not shown in this example) variables can be exhanged between WinCC Unified and the CWC. They are defined in the [manifest.json file]({d722178a-239f-4be0-ab55-b24616547bd7}/manifest.json) (see the "properties" section):
+This is the simplest method: number, string, or structured (not shown in this example) variables can be exchanged between WinCC Unified and the CWC. They are defined in the [manifest.json file]({d722178a-239f-4be0-ab55-b24616547bd7}/manifest.json) (see the "properties" section):
 
 ```
 "properties": {
