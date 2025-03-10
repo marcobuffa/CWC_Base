@@ -1,6 +1,6 @@
 # CWC_Base
 
-## A very basic (& useless) Custom Web Control (CWC) to to show how stuff works with WinCC Unified
+## A very basic (& useless) Custom Web Control (CWC) to show how stuff works with WinCC Unified
 
 ![A graduation hat]({d722178a-239f-4be0-ab55-b24616547bd7}/assets/learning.png)
 
